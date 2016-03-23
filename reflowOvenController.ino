@@ -93,9 +93,9 @@
 *******************************************************************************/
 // Comment either one the following #define to select your board revision
 // Newer board version starts from v1.60 using MAX31855KASA+ chip 
-#define  USE_MAX31855
+// #define  USE_MAX31855
 // Older board version below version v1.60 using MAX6675ISA+ chip
-//#define USE_MAX6675
+#define USE_MAX6675
 
 // ***** INCLUDES *****
 #include <LiquidCrystal.h>
