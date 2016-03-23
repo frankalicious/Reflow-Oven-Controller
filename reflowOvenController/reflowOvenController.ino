@@ -97,8 +97,14 @@
 // Older board version below version v1.60 using MAX6675ISA+ chip
 #define USE_MAX6675
 
+#define USE_I2C_LCD
 // ***** INCLUDES *****
+#ifdef USE_I2C_LCD
+#include <LiquidCrystal_I2C.h>
+#else
 #include <LiquidCrystal.h>
+#endif
+
 #ifdef	USE_MAX31855
 	#include <MAX31855.h>
 #else
@@ -115,7 +121,7 @@ typedef enum REFLOW_STATE
   REFLOW_STATE_REFLOW,
   REFLOW_STATE_COOL,
   REFLOW_STATE_COMPLETE,
-	REFLOW_STATE_TOO_HOT,
+  REFLOW_STATE_TOO_HOT,
   REFLOW_STATE_ERROR
 } reflowState_t;
 
@@ -197,19 +203,23 @@ unsigned char degree[8]  = {
 	int buzzerPin = 6;
 	int switchPin = A0;
 #else
-	int ssrPin = 5;
-	int thermocoupleSOPin = A5;
-	int thermocoupleCSPin = A4;
-	int thermocoupleCLKPin = A3;
+	int ssrPin = A2;
+	// int thermocoupleSOPin = A5;
+	// int thermocoupleCSPin = A4;
+int thermocoupleSOPin = 6;
+  int thermocoupleCSPin = 7;
+	int thermocoupleCLKPin = 8;
+#ifndef USE_I2C_LCD
 	int lcdRsPin = 7;
 	int lcdEPin = 8;
 	int lcdD4Pin = 9;
 	int lcdD5Pin = 10;
 	int lcdD6Pin = 11;
 	int lcdD7Pin = 12;
+#endif
 	int ledRedPin = A1;
 	int ledGreenPin = A0;
-	int buzzerPin = 6;
+	int buzzerPin = 4;
 	int switch1Pin = 2;
 	int switch2Pin = 3;
 #endif
@@ -242,8 +252,15 @@ int timerSeconds;
 
 // Specify PID control interface
 PID reflowOvenPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
+
 // Specify LCD interface
+#ifdef USE_I2C_LCD
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+#else
 LiquidCrystal lcd(lcdRsPin, lcdEPin, lcdD4Pin, lcdD5Pin, lcdD6Pin, lcdD7Pin);
+#endif
+
 // Specify MAX6675 thermocouple interface
 #ifdef	USE_MAX31855
 MAX31855 thermocouple(thermocoupleSOPin, thermocoupleCSPin,
@@ -271,7 +288,7 @@ void setup()
     digitalWrite(ledGreenPin, LOW);
     pinMode(ledGreenPin, OUTPUT);
 // Switch pins initialization
-    pinMode(switch1Pin, INPUT);
+    pinMode(switch1Pin, INPUT_PULLUP);
     pinMode(switch2Pin, INPUT);
 #endif
 
@@ -281,7 +298,12 @@ void setup()
   Serial.begin(57600);
   Serial.println("Reflow");
   Serial.println("Oven 1.2");
+#ifdef USE_I2C_LCD
+  lcd.begin();
+
+#else
   lcd.begin(8, 2);
+#endif
   lcd.createChar(0, degree);
   lcd.clear();
   lcd.print("Reflow");
