@@ -173,7 +173,7 @@ const char* lcdMessagesReflowStatus[] = {
   "Reflow",
   "Cool",
   "Complete",
-	"Wait,hot",
+  "Wait,hot",
   "Error"
 };
 
@@ -246,11 +246,11 @@ PID reflowOvenPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 LiquidCrystal lcd(lcdRsPin, lcdEPin, lcdD4Pin, lcdD5Pin, lcdD6Pin, lcdD7Pin);
 // Specify MAX6675 thermocouple interface
 #ifdef	USE_MAX31855
-	MAX31855 thermocouple(thermocoupleSOPin, thermocoupleCSPin, 
-												thermocoupleCLKPin);
+MAX31855 thermocouple(thermocoupleSOPin, thermocoupleCSPin,
+                      thermocoupleCLKPin);
 #else
-	MAX6675 thermocouple(thermocoupleCLKPin, thermocoupleCSPin, 
-											 thermocoupleSOPin);
+MAX6675 thermocouple(thermocoupleCLKPin, thermocoupleCSPin,
+                     thermocoupleSOPin);
 #endif
 
 void setup()
@@ -266,14 +266,14 @@ void setup()
   // LED pins initialization and turn on upon start-up (active low)
   digitalWrite(ledRedPin, LOW);
   pinMode(ledRedPin, OUTPUT);
-	#ifdef USE_MAX6675
+#ifdef USE_MAX6675
     // LED pins initialization and turn on upon start-up (active low)
-    digitalWrite(ledGreenPin, LOW);	
-		pinMode(ledGreenPin, OUTPUT);
-		// Switch pins initialization
-		pinMode(switch1Pin, INPUT);
-		pinMode(switch2Pin, INPUT);
-	#endif	
+    digitalWrite(ledGreenPin, LOW);
+    pinMode(ledGreenPin, OUTPUT);
+// Switch pins initialization
+    pinMode(switch1Pin, INPUT);
+    pinMode(switch2Pin, INPUT);
+#endif
 
   // Start-up splash
   digitalWrite(buzzerPin, HIGH);
@@ -292,9 +292,9 @@ void setup()
 
   // Turn off LED (active low)
   digitalWrite(ledRedPin, HIGH);
-	#ifdef  USE_MAX6675
-		digitalWrite(ledGreenPin, HIGH);
-	#endif
+#ifdef  USE_MAX6675
+  digitalWrite(ledGreenPin, HIGH);
+#endif
   // Set window size
   windowSize = 2000;
   // Initialize time keeping variable
@@ -314,20 +314,20 @@ void loop()
     // Read thermocouple next sampling period
     nextRead += SENSOR_SAMPLING_TIME;
     // Read current temperature
-		#ifdef	USE_MAX31855
-			input = thermocouple.readThermocouple(CELSIUS);
-		#else
-			input = thermocouple.readCelsius();
-		#endif
-		
+#ifdef	USE_MAX31855
+    input = thermocouple.readThermocouple(CELSIUS);
+#else
+    input = thermocouple.readCelsius();
+#endif
+
     // If thermocouple problem detected
-		#ifdef	USE_MAX6675
-			if (isnan(input))
-		#else
-			if((input == FAULT_OPEN) || (input == FAULT_SHORT_GND) || 
-				 (input == FAULT_SHORT_VCC))
-    #endif
-		{
+#ifdef	USE_MAX6675
+    if (isnan(input))
+#else
+      if((input == FAULT_OPEN) || (input == FAULT_SHORT_GND) ||
+         (input == FAULT_SHORT_VCC))
+#endif
+    {
       // Illegal operation
       reflowState = REFLOW_STATE_ERROR;
       reflowStatus = REFLOW_STATUS_OFF;
@@ -345,7 +345,7 @@ void loop()
       digitalWrite(ledRedPin, !(digitalRead(ledRedPin)));
       // Increase seconds timer for reflow curve analysis
       timerSeconds++;
-      // Send temperature and time stamp to serial 
+      // Send temperature and time stamp to serial
       Serial.print(timerSeconds);
       Serial.print(" ");
       Serial.print(setpoint);
@@ -378,13 +378,13 @@ void loop()
       // Print current temperature
       lcd.print(input);
 
-			#if ARDUINO >= 100
-				// Print degree Celsius symbol
-				lcd.write((uint8_t)0);
-			#else
-				// Print degree Celsius symbol
-				lcd.print(0, BYTE);
-			#endif
+#if ARDUINO >= 100
+      // Print degree Celsius symbol
+      lcd.write((uint8_t)0);
+#else
+      // Print degree Celsius symbol
+      lcd.print(0, BYTE);
+#endif
       lcd.print("C ");
     }
   }
@@ -393,16 +393,16 @@ void loop()
   switch (reflowState)
   {
   case REFLOW_STATE_IDLE:
-		// If oven temperature is still above room temperature
-		if (input >= TEMPERATURE_ROOM)
-		{
-			reflowState = REFLOW_STATE_TOO_HOT;
-		}
-		else
-		{
-			// If switch is pressed to start reflow process
-			if (switchStatus == SWITCH_1)
-			{
+    // If oven temperature is still above room temperature
+    if (input >= TEMPERATURE_ROOM)
+    {
+      reflowState = REFLOW_STATE_TOO_HOT;
+    }
+    else
+    {
+      // If switch is pressed to start reflow process
+      if (switchStatus == SWITCH_1)
+      {
         // Send header for CSV file
         Serial.println("Time Setpoint Input Output");
         // Intialize seconds timer for serial debug information
@@ -424,7 +424,7 @@ void loop()
 
   case REFLOW_STATE_PREHEAT:
     reflowStatus = REFLOW_STATUS_ON;
-    // If minimum soak temperature is achieve       
+    // If minimum soak temperature is achieve
     if (input >= TEMPERATURE_SOAK_MIN)
     {
       // Chop soaking period into smaller sub-period
@@ -432,14 +432,14 @@ void loop()
       // Set less agressive PID parameters for soaking ramp
       reflowOvenPID.SetTunings(PID_KP_SOAK, PID_KI_SOAK, PID_KD_SOAK);
       // Ramp up to first section of soaking temperature
-      setpoint = TEMPERATURE_SOAK_MIN + SOAK_TEMPERATURE_STEP;   
+      setpoint = TEMPERATURE_SOAK_MIN + SOAK_TEMPERATURE_STEP;
       // Proceed to soaking state
-      reflowState = REFLOW_STATE_SOAK; 
+      reflowState = REFLOW_STATE_SOAK;
     }
     break;
 
-  case REFLOW_STATE_SOAK:     
-    // If micro soak temperature is achieved       
+  case REFLOW_STATE_SOAK:
+    // If micro soak temperature is achieved
     if (millis() > timerSoak)
     {
       timerSoak = millis() + SOAK_MICRO_PERIOD;
@@ -450,12 +450,12 @@ void loop()
         // Set agressive PID parameters for reflow ramp
         reflowOvenPID.SetTunings(PID_KP_REFLOW, PID_KI_REFLOW, PID_KD_REFLOW);
         // Ramp up to first section of soaking temperature
-        setpoint = TEMPERATURE_REFLOW_MAX;   
+        setpoint = TEMPERATURE_REFLOW_MAX;
         // Proceed to reflowing state
-        reflowState = REFLOW_STATE_REFLOW; 
+        reflowState = REFLOW_STATE_REFLOW;
       }
     }
-    break; 
+    break;
 
   case REFLOW_STATE_REFLOW:
     // We need to avoid hovering at peak temperature for too long
@@ -465,71 +465,71 @@ void loop()
       // Set PID parameters for cooling ramp
       reflowOvenPID.SetTunings(PID_KP_REFLOW, PID_KI_REFLOW, PID_KD_REFLOW);
       // Ramp down to minimum cooling temperature
-      setpoint = TEMPERATURE_COOL_MIN;   
+      setpoint = TEMPERATURE_COOL_MIN;
       // Proceed to cooling state
-      reflowState = REFLOW_STATE_COOL; 
+      reflowState = REFLOW_STATE_COOL;
     }
-    break;   
+    break;
 
   case REFLOW_STATE_COOL:
-    // If minimum cool temperature is achieve       
+    // If minimum cool temperature is achieve
     if (input <= TEMPERATURE_COOL_MIN)
     {
       // Retrieve current time for buzzer usage
       buzzerPeriod = millis() + 1000;
       // Turn on buzzer and green LED to indicate completion
-			#ifdef	USE_MAX6675
-				digitalWrite(ledGreenPin, LOW);
-      #endif
-			digitalWrite(buzzerPin, HIGH);
+#ifdef	USE_MAX6675
+      digitalWrite(ledGreenPin, LOW);
+#endif
+      digitalWrite(buzzerPin, HIGH);
       // Turn off reflow process
-      reflowStatus = REFLOW_STATUS_OFF;                
+      reflowStatus = REFLOW_STATUS_OFF;
       // Proceed to reflow Completion state
-      reflowState = REFLOW_STATE_COMPLETE; 
-    }         
-    break;    
+      reflowState = REFLOW_STATE_COMPLETE;
+    }
+    break;
 
   case REFLOW_STATE_COMPLETE:
     if (millis() > buzzerPeriod)
     {
       // Turn off buzzer and green LED
       digitalWrite(buzzerPin, LOW);
-			#ifdef	USE_MAX6675
-				digitalWrite(ledGreenPin, HIGH);
-			#endif
-			// Reflow process ended
-      reflowState = REFLOW_STATE_IDLE; 
+#ifdef	USE_MAX6675
+      digitalWrite(ledGreenPin, HIGH);
+#endif
+      // Reflow process ended
+      reflowState = REFLOW_STATE_IDLE;
     }
     break;
-	
-	case REFLOW_STATE_TOO_HOT:
-		// If oven temperature drops below room temperature
-		if (input < TEMPERATURE_ROOM)
-		{
-			// Ready to reflow
-			reflowState = REFLOW_STATE_IDLE;
-		}
-		break;
-		
+
+    case REFLOW_STATE_TOO_HOT:
+      // If oven temperature drops below room temperature
+      if (input < TEMPERATURE_ROOM)
+      {
+        // Ready to reflow
+        reflowState = REFLOW_STATE_IDLE;
+      }
+      break;
+
   case REFLOW_STATE_ERROR:
     // If thermocouple problem is still present
-		#ifdef	USE_MAX6675
-			if (isnan(input))
-		#else
-			if((input == FAULT_OPEN) || (input == FAULT_SHORT_GND) || 
-				 (input == FAULT_SHORT_VCC))
-    #endif
+#ifdef	USE_MAX6675
+    if (isnan(input))
+#else
+      if((input == FAULT_OPEN) || (input == FAULT_SHORT_GND) ||
+         (input == FAULT_SHORT_VCC))
+#endif
     {
       // Wait until thermocouple wire is connected
-      reflowState = REFLOW_STATE_ERROR; 
+      reflowState = REFLOW_STATE_ERROR;
     }
     else
     {
       // Clear to perform reflow process
-      reflowState = REFLOW_STATE_IDLE; 
+      reflowState = REFLOW_STATE_IDLE;
     }
-    break;    
-  }    
+    break;
+  }
 
   // If switch 1 is pressed
   if (switchStatus == SWITCH_1)
@@ -543,64 +543,64 @@ void loop()
       // Reinitialize state machine
       reflowState = REFLOW_STATE_IDLE;
     }
-  } 
+  }
 
   // Simple switch debounce state machine (for switch #1 (both analog & digital
-	// switch supported))
+  // switch supported))
   switch (debounceState)
   {
   case DEBOUNCE_STATE_IDLE:
     // No valid switch press
     switchStatus = SWITCH_NONE;
     // If switch #1 is pressed
-		#ifdef	USE_MAX6675
-			if (digitalRead(switch1Pin) == LOW)
-		#else
-			if (analogRead(switchPin) == 0)
-		#endif
-			{
-				// Intialize debounce counter
-				lastDebounceTime = millis();
-				// Proceed to check validity of button press
-				debounceState = DEBOUNCE_STATE_CHECK;
-			}	
+#ifdef	USE_MAX6675
+    if (digitalRead(switch1Pin) == LOW)
+#else
+      if (analogRead(switchPin) == 0)
+#endif
+      {
+        // Intialize debounce counter
+        lastDebounceTime = millis();
+        // Proceed to check validity of button press
+        debounceState = DEBOUNCE_STATE_CHECK;
+      }
     break;
 
   case DEBOUNCE_STATE_CHECK:
-		#ifdef	USE_MAX6675
-			// If switch #1 is still pressed
-			if (digitalRead(switch1Pin) == LOW)
-		#else
-			if (analogRead(switchPin) == 0)
-		#endif
-			{
-				// If minimum debounce period is completed
-				if ((millis() - lastDebounceTime) > DEBOUNCE_PERIOD_MIN)
-				{
-					// Proceed to wait for button release
-					debounceState = DEBOUNCE_STATE_RELEASE;
-				}
-			}
-			// False trigger
-			else
-			{
-				// Reinitialize button debounce state machine
-				debounceState = DEBOUNCE_STATE_IDLE; 
-			}
+#ifdef	USE_MAX6675
+    // If switch #1 is still pressed
+    if (digitalRead(switch1Pin) == LOW)
+#else
+      if (analogRead(switchPin) == 0)
+#endif
+      {
+        // If minimum debounce period is completed
+        if ((millis() - lastDebounceTime) > DEBOUNCE_PERIOD_MIN)
+        {
+          // Proceed to wait for button release
+          debounceState = DEBOUNCE_STATE_RELEASE;
+        }
+      }
+      // False trigger
+      else
+      {
+        // Reinitialize button debounce state machine
+        debounceState = DEBOUNCE_STATE_IDLE;
+      }
     break;
 
   case DEBOUNCE_STATE_RELEASE:
-		#ifdef	USE_MAX6675	
-			if (digitalRead(switch1Pin) == HIGH)
-    #else
-			if (analogRead(switchPin) > 0)
-		#endif
-		{
-      // Valid switch 1 press
-      switchStatus = SWITCH_1;
-      // Reinitialize button debounce state machine
-      debounceState = DEBOUNCE_STATE_IDLE; 
-    }
+#ifdef	USE_MAX6675
+    if (digitalRead(switch1Pin) == HIGH)
+#else
+      if (analogRead(switchPin) > 0)
+#endif
+      {
+        // Valid switch 1 press
+        switchStatus = SWITCH_1;
+        // Reinitialize button debounce state machine
+        debounceState = DEBOUNCE_STATE_IDLE;
+      }
     break;
   }
 
@@ -612,15 +612,15 @@ void loop()
     reflowOvenPID.Compute();
 
     if((now - windowStartTime) > windowSize)
-    { 
+    {
       // Time to shift the Relay Window
       windowStartTime += windowSize;
     }
     if(output > (now - windowStartTime)) digitalWrite(ssrPin, HIGH);
-    else digitalWrite(ssrPin, LOW);   
+    else digitalWrite(ssrPin, LOW);
   }
   // Reflow oven process is off, ensure oven is off
-  else 
+  else
   {
     digitalWrite(ssrPin, LOW);
   }
