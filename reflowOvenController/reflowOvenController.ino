@@ -277,6 +277,10 @@ void setup()
 
   // Start-up splash
   digitalWrite(buzzerPin, HIGH);
+  // Serial communication at 57600 bps
+  Serial.begin(57600);
+  Serial.println("Reflow");
+  Serial.println("Oven 1.2");
   lcd.begin(8, 2);
   lcd.createChar(0, degree);
   lcd.clear();
@@ -287,8 +291,6 @@ void setup()
   delay(2500);
   lcd.clear();
 
-  // Serial communication at 57600 bps
-  Serial.begin(57600);
 
   // Turn off LED (active low)
   digitalWrite(ledRedPin, HIGH);
@@ -616,8 +618,20 @@ void loop()
       // Time to shift the Relay Window
       windowStartTime += windowSize;
     }
-    if(output > (now - windowStartTime)) digitalWrite(ssrPin, HIGH);
-    else digitalWrite(ssrPin, LOW);
+    if(output > (now - windowStartTime))
+    {
+      //Serial.println("SSR on");
+      digitalWrite(ssrPin, HIGH);
+    }
+    else
+    {
+      Serial.println("SSR off");
+      Serial.print("output:");
+      Serial.print(output);
+      Serial.print(" (now - windowStartTime)");
+      Serial.println((now - windowStartTime));
+      digitalWrite(ssrPin, LOW);
+    }
   }
   // Reflow oven process is off, ensure oven is off
   else
