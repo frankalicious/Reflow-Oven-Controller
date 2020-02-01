@@ -1,6 +1,6 @@
 /*******************************************************************************
 * Title: Reflow Oven Controller
-* Version: 1.20
+* Version: 1.30
 * Date: 26-11-2012
 * Company: Rocket Scream Electronics
 * Author: Lim Phang Moh
@@ -297,7 +297,7 @@ void setup()
   // Serial communication at 57600 bps
   Serial.begin(57600);
   Serial.println("Reflow");
-  Serial.println("Oven 1.2");
+  Serial.println("Oven 1.3");
 #ifdef USE_I2C_LCD
   lcd.begin();
 
@@ -308,7 +308,7 @@ void setup()
   lcd.clear();
   lcd.print("Reflow");
   lcd.setCursor(0, 1);
-  lcd.print("Oven 1.2");
+  lcd.print("Oven 1.3");
   digitalWrite(buzzerPin, LOW);
   delay(2500);
   lcd.clear();
