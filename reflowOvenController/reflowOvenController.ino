@@ -640,7 +640,7 @@ void loop()
       // Time to shift the Relay Window
       windowStartTime += windowSize;
     }
-    if(output > (now - windowStartTime))
+    if(output >= (now - windowStartTime))
     {
       //Serial.println("SSR on");
       digitalWrite(ssrPin, HIGH);
