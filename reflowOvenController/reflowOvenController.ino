@@ -650,7 +650,7 @@ void loop()
       Serial.println("SSR off");
       Serial.print("output:");
       Serial.print(output);
-      Serial.print(" (now - windowStartTime)");
+      Serial.print(" (now - windowStartTime):");
       Serial.println((now - windowStartTime));
       digitalWrite(ssrPin, LOW);
     }
