@@ -48,7 +48,7 @@ def plot(filename):
         lastTemp = actTemp
         pos += 1
 
-    print 'time in liquid state: {0}s'.format(falling-rising)
+    print 'time in liquid state (above {0}°C): {1}s'.format(liquid_point,falling-rising)
 
     last = data['Input'][0]
     diff_input = list()
