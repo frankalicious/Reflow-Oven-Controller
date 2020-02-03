@@ -32,6 +32,10 @@ def plot(filename):
 
     lastTemp=-1
     pos = 0
+    rising = 0
+    rising_pos = 0
+    falling = 0
+    falling_pos = 0
     for actTemp in data['Input']:
         if actTemp >= liquid_point and lastTemp < liquid_point:
             rising = data['Time'][pos]
@@ -81,15 +85,20 @@ def plot(filename):
     # axarr[1].ylabel(u'temperature diff [°C]')
 
     # plt.annotate('rising', xy=(data['Time'][rising_pos], data['Input'][rising_pos]),
-    axarr[0].annotate('rising', xy=(data['Time'][rising_pos], data['Input'][rising_pos]),
-                     xytext=(data['Time'][rising_pos]+10, data['Input'][rising_pos]+10),
-                     arrowprops=dict(facecolor='black', shrink=0.05))
+    if rising_pos:
+        axarr[0].annotate('rising', xy=(data['Time'][rising_pos], data['Input'][rising_pos]),
+                          xytext=(data['Time'][rising_pos]+10, data['Input'][rising_pos]+10),
+                          arrowprops=dict(facecolor='black', shrink=0.05))
     # plt.annotate('falling', xy=(data['Time'][falling_pos], data['Input'][falling_pos]),
-    axarr[0].annotate('falling', xy=(data['Time'][falling_pos], data['Input'][falling_pos]),
-                     xytext=(data['Time'][falling_pos]+10, data['Input'][falling_pos]+10),
-                     arrowprops=dict(facecolor='black', shrink=0.05))
-    axarr[0].axvline(x=rising_pos, color='r')
-    axarr[0].axvline(x=falling_pos, color='r')
+
+    if falling_pos:
+        axarr[0].annotate('falling', xy=(data['Time'][falling_pos], data['Input'][falling_pos]),
+                          xytext=(data['Time'][falling_pos]+10, data['Input'][falling_pos]+10),
+                          arrowprops=dict(facecolor='black', shrink=0.05))
+    if rising_pos:
+        axarr[0].axvline(x=rising_pos, color='r')
+    if falling_pos:
+        axarr[0].axvline(x=falling_pos, color='r')
     axarr[0].axhline(y=liquid_point, color='r')
     plt.show()
 
