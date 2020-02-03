@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-15 -*-
+# -*- coding: utf-8 -*-
 
 import click
 import numpy as np
@@ -78,11 +78,11 @@ def plot(filename):
 
     # axarr[0].set_ylim([-10,300])
     plt.xlabel('time [s]')
-    # plt.ylabel(u'temperature [캜]')
-    axarr[0].set_ylabel(u'temperature [캜]')
-    axarr[1].set_ylabel(u'delta temperature [캜]')
+    # plt.ylabel(u'temperature [째C]')
+    axarr[0].set_ylabel(u'temperature [째C]')
+    axarr[1].set_ylabel(u'delta temperature [째C]')
     axarr[2].set_ylabel(u'ssr output [%]')
-    # axarr[1].ylabel(u'temperature diff [캜]')
+    # axarr[1].ylabel(u'temperature diff [째C]')
 
     # plt.annotate('rising', xy=(data['Time'][rising_pos], data['Input'][rising_pos]),
     if rising_pos:
