@@ -36,6 +36,8 @@ def plot(filename):
     rising_pos = 0
     falling = 0
     falling_pos = 0
+    max_input = 0
+    max_set = 0
     for actTemp in data['Input']:
         if actTemp >= liquid_point and lastTemp < liquid_point:
             rising = data['Time'][pos]
@@ -45,10 +47,20 @@ def plot(filename):
             falling = data['Time'][pos]
             falling_pos = pos
             print 'time stopping liquid: {0}s'.format(falling)
+        if actTemp > max_input:
+            max_input = actTemp
         lastTemp = actTemp
         pos += 1
 
     print 'time in liquid state (above {0}°C): {1}s'.format(liquid_point,falling-rising)
+
+    for setTemp in data['Setpoint']:
+        if setTemp > max_set:
+            max_set = setTemp
+
+    print
+    print 'maximum temperature set: {0}°C'.format(max_set)
+    print 'maximum temperature read: {0}°C'.format(max_input)
 
     last = data['Input'][0]
     diff_input = list()
